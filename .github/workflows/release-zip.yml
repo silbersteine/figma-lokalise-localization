@@ -1,0 +1,35 @@
+name: Publish skill zip
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/figma-lokalise-localization/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  zip-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build zip
+        run: |
+          cd skills
+          zip -r ../figma-lokalise-localization.zip figma-lokalise-localization
+
+      - name: Publish/update "latest" release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: Latest skill build
+          body: |
+            Auto-built from ${{ github.sha }}. Always matches the tip of `main`.
+            Not a versioned release — see CHANGELOG.md for version history.
+          allowUpdates: true
+          replacesArtifacts: true
+          makeLatest: true
+          artifacts: figma-lokalise-localization.zip

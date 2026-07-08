@@ -1,14 +1,22 @@
 # Figma ↔ Lokalise Localization Skill
 
-A portable **agent skill** that localizes Figma designs through Lokalise at the
-design stage. Any AI agent that can read a `SKILL.md` and call the Figma and
-Lokalise MCP tools can run it — Claude (claude.ai, Claude Code, API), Cursor,
-and other `AGENTS.md`-aware tools.
+A Claude **Skill** that localizes Figma designs through Lokalise at the design
+stage — push new copy to Lokalise as keys, generate translated preview pages,
+catch stale/drifted text, and pull reviewed translations back into Figma.
 
-The skill is a **router**: every run starts at
-[`skills/figma-lokalise-localization/SKILL.md`](skills/figma-lokalise-localization/SKILL.md),
-loads shared knowledge from `reference.md`, then follows exactly one flow under
-`flows/`.
+## Get started (2 minutes, no code)
+
+1. **Download the skill:**
+   [figma-lokalise-localization.zip](../../releases/latest/download/figma-lokalise-localization.zip)
+   — always matches the latest version on `main`.
+2. In Claude (claude.ai or Claude Desktop), go to **Settings → Capabilities →
+   Skills → Upload skill** and upload the zip as-is.
+3. Connect the **Figma** and **Lokalise** MCP connectors — the skill needs
+   both to actually read/write your file. See
+   [`docs/mcp-setup.md`](docs/mcp-setup.md) if you're not sure how.
+
+That's it. Open a Figma file, tell Claude what you want (e.g. "set up
+localization for this file"), and it takes it from there.
 
 ## What it does
 
@@ -20,25 +28,14 @@ loads shared knowledge from `reference.md`, then follows exactly one flow under
 | `check-stale` | Read-only drift + translation-coverage report |
 | `update-source` | Pull reviewed copy from Lokalise back into Figma source |
 
-## Prerequisites (the honest constraint)
+No external datastore is required: all config and per-node link state live in
+the Figma file's plugin data, so the skill can self-orient from the file alone.
 
-Instructions travel anywhere; **execution needs two MCP servers connected** in
-the agent's environment:
+## Other agents
 
-- **Figma MCP** — the `use_figma` tool (runs JS against the Figma Plugin API),
-  plus `get_metadata` / `get_screenshot` / `get_design_context`.
-- **Lokalise MCP** — `create_lokalise_keys`, `list_lokalise_keys`,
-  `update_lokalise_key`, `bulk_update_lokalise_keys`, and related.
-
-Without those tools the skill can still explain and plan, but cannot read or
-write designs/keys. See [`docs/mcp-setup.md`](docs/mcp-setup.md).
-
-No external datastore is required: all config and per-node link state live in the
-Figma file's plugin data, so any agent can self-orient from the file alone.
-
-## Install
-
-Drop the skill folder into the agent's skills directory:
+The skill is plain `SKILL.md` + Markdown, so anything that can read files and
+call the Figma/Lokalise MCP tools can run it — Claude Code, Cursor, and other
+`AGENTS.md`-aware agents, not just claude.ai.
 
 ```bash
 # Claude Code (user-level)
@@ -46,14 +43,11 @@ cp -r skills/figma-lokalise-localization ~/.claude/skills/
 
 # Cursor (project-level)
 cp -r skills/figma-lokalise-localization .cursor/skills/
-
-# or use the helper
-./scripts/install.sh claude   # or: cursor
 ```
 
 For agents that read `AGENTS.md`, this repo's root [`AGENTS.md`](AGENTS.md)
-points them at the skill. For a one-off paste into any chat, use
-[`docs/prompt-snippet.md`](docs/prompt-snippet.md).
+points them at the skill. For a one-off paste into any chat that can't load
+skills or files at all, use [`docs/prompt-snippet.md`](docs/prompt-snippet.md).
 
 ## Repo layout
 
@@ -65,7 +59,6 @@ skills/figma-lokalise-localization/   canonical skill — the single source of t
   flows/              one file per flow (setup, sync, download, check-stale, update-source)
 AGENTS.md             cross-provider router (agents.md standard)
 docs/                 MCP setup, governance, paste-in fallback
-scripts/install.sh    copy the skill into an agent's skills dir
 ```
 
 **Editing rule:** change only files under `skills/…`. Everything else is
