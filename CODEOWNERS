@@ -3,6 +3,7 @@
 
 /skills/**            @your-org/localization-tooling
 /skills/figma-lokalise-localization/flows/**   @your-org/localization-tooling
+/figma-agent/**       @your-org/localization-tooling
 
 # Scaffolding can have lighter ownership if you like:
 # /docs/**            @your-org/docs

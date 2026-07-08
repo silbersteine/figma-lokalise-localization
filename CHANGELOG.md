@@ -11,6 +11,13 @@ patch = docs/clarity.
 ## [Unreleased]
 
 ### Added
+- **`figma-agent/SKILL.md`** — standalone single-file version of the skill for
+  agents that can't load reference files at runtime (e.g. Figma's native AI
+  agent). Same storage contract and five flows as canonical, folded into one
+  file. Hand-maintained alongside `skills/figma-lokalise-localization/`, not
+  generated from it — see `docs/governance.md` for how the two relate. Also
+  adds plurals and rich-text (links/solid-color spans) push+download support
+  not yet present in canonical.
 - **Rich-text drift handling.** `check-stale` gained step 4b: rich (HTML) keys
   are reconciled by comparing plain-text projections instead of hashes, removing
   the permanent false "drifted" for formatted text. The formatting axis is

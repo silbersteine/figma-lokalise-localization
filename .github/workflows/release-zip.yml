@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "skills/figma-lokalise-localization/**"
+      - "figma-agent/SKILL.md"
   workflow_dispatch: {}
 
 permissions:
@@ -29,7 +30,11 @@ jobs:
           body: |
             Auto-built from ${{ github.sha }}. Always matches the tip of `main`.
             Not a versioned release — see CHANGELOG.md for version history.
+
+            Assets:
+            - `figma-lokalise-localization.zip` — the full multi-file skill (Claude, Cursor, other AGENTS.md-aware agents).
+            - `SKILL.md` — standalone single-file version for agents that can't load reference files (e.g. Figma's native AI agent).
           allowUpdates: true
           replacesArtifacts: true
           makeLatest: true
-          artifacts: figma-lokalise-localization.zip
+          artifacts: figma-lokalise-localization.zip,figma-agent/SKILL.md

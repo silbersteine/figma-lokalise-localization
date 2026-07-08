@@ -49,6 +49,22 @@ For agents that read `AGENTS.md`, this repo's root [`AGENTS.md`](AGENTS.md)
 points them at the skill. For a one-off paste into any chat that can't load
 skills or files at all, use [`docs/prompt-snippet.md`](docs/prompt-snippet.md).
 
+### Figma's native AI agent
+
+Figma's own in-product AI agent takes a single instructions file and can't
+load additional reference files at runtime, so the multi-file skill above
+won't work there as-is. Use the standalone, self-contained version instead:
+
+[`figma-agent/SKILL.md`](../../releases/latest/download/SKILL.md) — always
+matches the latest version on `main`.
+
+Everything the flows need (storage contract, snippets, key naming, field
+mapping, drift handling) is folded into this one file rather than split
+across `reference.md` and `flows/`. It's maintained by hand alongside the
+canonical skill, not auto-generated from it, and its feature set isn't
+identical — see [`docs/governance.md`](docs/governance.md) for how the two
+are kept in sync and where they're allowed to diverge.
+
 ## Repo layout
 
 ```
@@ -57,12 +73,15 @@ skills/figma-lokalise-localization/   canonical skill — the single source of t
   reference.md        storage contract, field mapping, Plugin-API snippets, rules
   known-limitations.md honest list of what the MCP tooling can't do yet
   flows/              one file per flow (setup, sync, download, check-stale, update-source)
+figma-agent/SKILL.md  standalone single-file version for Figma's native AI agent
 AGENTS.md             cross-provider router (agents.md standard)
 docs/                 MCP setup, governance, paste-in fallback
 ```
 
-**Editing rule:** change only files under `skills/…`. Everything else is
-scaffolding around that source of truth.
+**Editing rule:** the canonical source of truth is `skills/…`. `figma-agent/SKILL.md`
+is the one other hand-maintained exception — everything else is scaffolding
+around these two. See [`docs/governance.md`](docs/governance.md) for how the
+two skill files relate.
 
 ## What deliberately stays out of this repo
 

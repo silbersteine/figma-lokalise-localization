@@ -1,4 +1,4 @@
-<!-- Thanks for improving the skill. Keep changes scoped to skills/… — the rest is scaffolding. -->
+<!-- Thanks for improving the skill. Keep changes scoped to skills/… and figma-agent/SKILL.md — the rest is scaffolding. -->
 
 ## What changed
 
@@ -13,9 +13,10 @@
 
 ## Checklist
 
-- [ ] Edited only files under `skills/…` (or explained why scaffolding changed)
+- [ ] Edited only files under `skills/…` or `figma-agent/SKILL.md` (or explained why scaffolding changed)
 - [ ] Updated `CHANGELOG.md` (behavior = minor, docs = patch, pre-1.0)
 - [ ] Kept **instance data out** (no key IDs, task IDs, node IDs, `*.mjs`)
 - [ ] Cross-references still resolve (e.g. a flow citing `reference.md §N`)
 - [ ] Safety model still holds (read-only vs write; confirmation gates intact)
 - [ ] Noted any **MCP compatibility** impact (Lokalise/Figma tool shape or version)
+- [ ] If this changed `skills/…` behavior, considered whether `figma-agent/SKILL.md` needs the same change (or noted why it's an intentional gap there)
