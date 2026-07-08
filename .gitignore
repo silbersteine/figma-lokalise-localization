@@ -1,0 +1,24 @@
+# Secrets / credentials — never commit; MCP config holds these
+.env
+.env.*
+*.pem
+*_token*
+*secret*
+
+# Session / project artifacts — instance data, not reusable skill knowledge
+*.mjs
+.*-sync.mjs
+.*-test.mjs
+session-notes*.md
+scratch/
+tmp/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# Node (if scripts/tooling are added later)
+node_modules/
+npm-debug.log*

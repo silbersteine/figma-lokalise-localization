@@ -1,0 +1,8 @@
+# Require review for the skill source of truth.
+# Replace the placeholders with your GitHub team/handles before publishing.
+
+/skills/**            @your-org/localization-tooling
+/skills/figma-lokalise-localization/flows/**   @your-org/localization-tooling
+
+# Scaffolding can have lighter ownership if you like:
+# /docs/**            @your-org/docs
