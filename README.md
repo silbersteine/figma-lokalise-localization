@@ -63,7 +63,99 @@ always confirm before writing — especially when overwriting source text.
 
 ---
 
-## Prerequisites
+## Metadata and design-to-code handoff
+
+Every synced text node carries a **two-sided link**: lightweight state on the
+Figma layer, rich context on the Lokalise key. That link is what makes the file
+more than a pile of strings — it becomes a structured handoff surface from
+design to engineering.
+
+### What's stored on Figma text nodes
+
+On sync, each linked text node gets **shared plugin data** (namespace
+`lokalise`) written directly onto the layer:
+
+| Field | Purpose |
+| --- | --- |
+| `keyName` | Stable key identifier (e.g. `checkout.summary.total_label`) |
+| `keyId` | Lokalise key ID — the live link back to the TMS |
+| `lastPushedAt` | When this node was last sent to Lokalise |
+| `lastPushedContentHash` | Fingerprint of the source text at push time (drift detection) |
+| `lastPushedContentKind` | `"html"` for rich text, plain otherwise |
+| `lastPulledAt` / `lastPulledLang` | Set when a translation preview is written into a clone |
+
+Screen frames carry rollups (`lastSyncedAt`, `lastSyncedKeyCount`). File-wide
+config (project ID, languages, naming convention) lives on the document root.
+Nothing external — open the file in Figma and the link state travels with it.
+
+### What's stored in Lokalise (on each key)
+
+When text is pushed, the skill creates or updates a Lokalise key with more than
+just the string:
+
+- **`key_name`** — the same stable name on the node; this is what engineering
+  imports into code
+- **`tags`** — screen, page, purpose (`heading`, `cta`, `nav_item`, `body`),
+  component, and more — for filtering and automation in Lokalise
+- **`context`** — machine-readable back-reference to the Figma node
+- **`description`** — translator-facing notes
+- **`custom_attributes`** — a JSON object with design facts, including:
+  - Layer name and full layer path
+  - Figma node ID, file key, and deep link URL
+  - Parent frame, page name, component name
+  - Font family, style, size; text box width and resize mode
+  - Placeholder tokens (e.g. `{username}`) extracted from the source string
+  - Content hash and push timestamp
+
+See [`skills/figma-lokalise-localization/reference.md`](skills/figma-lokalise-localization/reference.md) for the full mapping.
+
+### Using metadata for design → code handoff
+
+Once keys exist, the pipeline from design to production code gets concrete:
+
+1. **Stable key names** flow from Figma naming conventions → Lokalise → your
+   i18n files (`checkout.summary.total_label` in both places)
+2. **Figma deep links** on each key let engineers or codegen agents jump from a
+   string in Lokalise straight to the exact text layer in the file
+3. **Placeholder tokens** tell devs which strings are templates vs literals and
+   what variables the UI expects
+4. **Typography and layout hints** (font, width, auto-resize) flag strings that
+   may truncate or need different treatment per locale
+5. **Purpose tags** (`heading`, `cta`, …) help tooling pick the right HTML
+   element or component variant in code
+
+A codegen agent, CI export, or Lokalise file download can consume this metadata
+without anyone re-entering context by hand.
+
+### Go beyond translation metadata
+
+The default skill focuses on localization, but **`custom_attributes` is an open
+schema** — you can push whatever your team needs. Think big and customize the
+skill to capture internationalization concerns that matter in your product:
+
+- **Character or line limits** — "German will overflow this 120px button"
+- **RTL / bidirectional text** — flag strings that need mirroring or special
+  handling in Arabic or Hebrew
+- **Plural and gender rules** — mark keys that need `{count}` variants or
+  gendered copy in certain locales
+- **Truncation risk** — note when a label sits in a fixed-width container
+- **Legal / brand sensitivity** — tag copy that requires compliance review
+- **Component-to-code mapping** — link a string to a React prop, SwiftUI key, or
+  Code Connect component
+
+To add fields, edit the skill's sync mapping (in
+[`reference.md`](skills/figma-lokalise-localization/reference.md) for Claude /
+Cursor, or [`figma-agent/SKILL.md`](figma-agent/SKILL.md) for Figma native) and
+teach the agent when to populate them — from layer names, component properties,
+designer annotations, or a checklist you define. The same pattern works for
+**extra plugin data on Figma nodes** if you want state that never leaves the
+file.
+
+Translation metadata is the starting point. The skill is a template for any
+metadata your design-to-code pipeline needs — you just need to describe it in
+the skill and let the agent write it on sync.
+
+---
 
 Before any flow runs, you need:
 
@@ -264,7 +356,9 @@ When you run **setup**, you define defaults that every later flow respects:
   across screens
 
 Those choices live in the Figma file. Re-run setup anytime your conventions
-evolve.
+evolve. For the full picture of what gets written onto nodes and into Lokalise,
+see [Metadata and design-to-code handoff](#metadata-and-design-to-code-handoff)
+above.
 
 ### Adapt the skill instructions
 
@@ -278,8 +372,9 @@ The skill files are plain Markdown — readable, editable, versionable:
 Examples of adaptations teams often make:
 
 - **Stricter key naming** — enforce your component naming from the design system
-- **Extra metadata on push** — designer notes, char limits, or context fields
-  your translators rely on
+- **Extra metadata on push** — char limits, RTL flags, truncation notes, or any
+  i18n consideration your engineers and translators need (see
+  [Metadata and design-to-code handoff](#metadata-and-design-to-code-handoff))
 - **Different preview layout** — match how your team reviews localized UI (e.g.
   always clone next to source)
 - **Rich text and plurals** — the Figma-native skill already handles links,
