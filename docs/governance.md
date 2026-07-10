@@ -75,6 +75,7 @@ can be traced to a tool change.
 ## Adoption checklist for a new team
 
 1. Connect Figma + Lokalise MCP (see [`mcp-setup.md`](mcp-setup.md)).
-2. Install the skill (`scripts/install.sh`) or vendor it via submodule/subtree.
+2. Install the skill (see README — zip upload or copy the skill folder) or
+   vendor it via submodule/subtree.
 3. Run `setup` on a test Figma file; confirm config lands in plugin data.
 4. Try `check-stale` (read-only) before any writing flow.
